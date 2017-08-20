@@ -1,11 +1,19 @@
 'use strict'
+let action = require('PlayerActions.js');
 
 class PlayerController {
     constructor(socket, game) {
         this.socket = socket;
         this.game = game;
 
-        //TODO: Do socket on initializations here:
+        //Attach listeners to socket for player actions
+        socket.on(actions.SELECTED_SONG, function(data) {
+            this.game.onSongSelected(data.songId);
+        });
+
+        socket.on(actions.ANSWERED, function(data) {
+            this.game.onAnswered(data.songId);
+        });
 
     }
 
