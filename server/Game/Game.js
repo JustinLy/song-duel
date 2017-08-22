@@ -37,6 +37,12 @@ class Game {
         
     }
 
+    onSongSelected(songId) {
+        //call spotify service to get preview, song name, etc (or maybe frontned gives it?)
+        //call spotify service to get 4 related song ids and names
+        //package the preview and 4 related songs into data object
+    }
+
     _startGame() {
         //Pick a random player to be the first to choose a song. All others will wait to answer.
         let indexOfChooser = this.numPlayers * Math.random() + 1;
