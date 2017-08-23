@@ -1,12 +1,16 @@
 'use strict'
 
 //Load credentials from file
-require('dotenv').config()
+require('dotenv').config();
 
 const credentials = {
-  client: {
+  client : {
     id: process.env.client_id,
     secret: process.env.client_secret
+  },
+  auth : {
+    tokenHost : "https://accounts.spotify.com",
+    tokenPath : "/api/token"
   }
 };
 
@@ -21,17 +25,20 @@ let accessToken = null;
  * containing relevant fields.
  */
 exports.getSong = function(songId) {
-    ensureAccessToken();
-    return request({
-        uri : "https://api.spotify.com/v1/tracks/${songId}",
-        headers: {
-            'Authorization' : accessToken.token()
-        }
-    }).then((songData) => {
-        return new Song(songData);
-    }).catch(error => {
-        console.log("Spotify get track error", error.message());
-        throw error;
+    return ensureAccessToken().then(() => {
+        console.log(accessToken);
+        return request({
+            uri : `https://api.spotify.com/v1/tracks/${songId}`,
+            headers: {
+                'Authorization' : "Bearer " + accessToken.token.access_token,
+            },
+            json:true
+        }).then((songData) => {
+            return new Song(songData);
+        }).catch(error => {
+            console.log("Spotify get track error", error.message());
+            throw error;
+        });
     });
 }
 
@@ -44,11 +51,14 @@ function ensureAccessToken() {
     const tokenConfig = {};
     //Fetch new token if one doesn't exist or it has expired. Spotify doesn't provide a refresh token.
     if (!accessToken || accessToken.expired()) {
-        oauth2.clientCredentials.getToken(tokenConfig).then((result) => {
+        return oauth2.clientCredentials.getToken(tokenConfig).then((result) => {
+            console.log(result);
             accessToken = oauth2.accessToken.create(result);
         }).catch((error) => {
             console.log("Access token error", error.message);
         });
+    } else {
+        return new Promise((resolve, reject) => resolve());
     }
 }
  

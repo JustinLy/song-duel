@@ -14,3 +14,5 @@ class Song {
         this.artists = artists;
     }
 }
+
+module.exports = Song;

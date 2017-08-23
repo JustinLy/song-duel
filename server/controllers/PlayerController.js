@@ -12,7 +12,7 @@ class PlayerController {
         });
 
         socket.on(actions.ANSWERED, function(data) {
-            this.game.onAnswered(data.songId);
+            this.game.onAnswered(data.songId, this.socket.playerId);
         });
 
     }
@@ -25,3 +25,5 @@ class PlayerController {
         this.socket.emit(newStateId, gameData);
     }
 }
+
+module.exports = PlayerController;
