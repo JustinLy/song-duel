@@ -1,0 +1,27 @@
+{
+    "id": "4pkFvX3AkuiSGPkv8gMlks",
+    "name": "Save Me",
+    "artists": [
+        {
+            "external_urls": {
+                "spotify": "https://open.spotify.com/artist/2pZCKLhbrrDD4PwEzrDig3"
+            },
+            "href": "https://api.spotify.com/v1/artists/2pZCKLhbrrDD4PwEzrDig3",
+            "id": "2pZCKLhbrrDD4PwEzrDig3",
+            "name": "Remy Zero",
+            "type": "artist",
+            "uri": "spotify:artist:2pZCKLhbrrDD4PwEzrDig3"
+        },
+        {
+            "external_urls": {
+                "spotify": "https://open.spotify.com/artist/2pZCKLhbrrDD4PwEzrDig3"
+            },
+            "href": "https://api.spotify.com/v1/artists/2pZCKLhbrrDD4PwEzrDig3",
+            "id": "2hl0xAkS2AIRAu23TVMBG1",
+            "name": "Kansas",
+            "type": "artist",
+            "uri": "spotify:artist:2pZCKLhbrrDD4PwEzrDig3"
+        }
+    ],
+    "preview_url": "https://p.scdn.co/mp3-preview/95d0bbf2725a8d81929d546db4947cf9ab01eb32?cid=7b68a983401244fb86b96fd27de5d143"
+}
