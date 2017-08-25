@@ -1,5 +1,8 @@
-WaitGameStartState = require('Game/Player/WaitSongState.js');
-PlayerStates = require('States.js');
+const WaitGameStartState = require('Game/Player/WaitSongState.js');
+const PlayerStates = require('States.js');
+const SpotifyService = require('services/SpotifyService.js');
+const Song = require('Song.js');
+const Question = require('Question.js');
 /**
  * Instance variables:
  * 
@@ -41,8 +44,24 @@ class Game {
         //call spotify service to get preview, song name, etc (or maybe frontned gives it?)
         //call spotify service to get 4 related song ids and names
         //package the preview and 4 related songs into data object
-    }
+        //update player state with that data
+        SpotifyService.getSong(songId).then((song) => {
+            return SpotifyService.getRecommendedSongs(song, 3).then((recommendedSongs) => {
+                //Save this as it will be needed to check player answers later.
+                this.currentQuestion = new Question(recommendedSongs, song);
+                
+                let gameData = {
+                        songOptions : this.currentQuestion.songOptions,
+                        previewUrl : song.previewUrl
+                }
+                this._forEachPlayer((playerState) => {
+                    playerState.updateState(gameData);
+                });
+            })
+        })
 
+    }
+    
     _startGame() {
         //Pick a random player to be the first to choose a song. All others will wait to answer.
         let indexOfChooser = this.numPlayers * Math.random() + 1;
