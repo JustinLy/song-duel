@@ -5,20 +5,32 @@ const Game = require('Game/Game.js');
 const PlayerController = require('controllers/PlayerController.js');
 const EventEmitter = require('events').EventEmitter;
 
-let gameMap = new Map();
+let gameMap = null;
 let gameEmitter = null;
+let io = null;
 /**
  * Get server ready to listen to incoming socket connections (players joining games)
  */
-exports.init = function(io) {
+exports.init = function(socketIo) {
+    io = socketIo;
+    gameMap = new Map();
     gameEmitter = new EventEmitter();
+
     //Destroy game if it has ended.
     gameEmitter.on('gameOver', (data) => {
+        //Broadcast the gameover event to players. eventId will be the reason why game ended
+        this.io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
+
         let currentGame = data.gameId ? this.gameMap.get(data.gameId) : null;
         if (currentGame) {
             currentGame.destroy();
             this.gameMap.delete(gameId);
         }
+    });
+
+    //Used to broadcast events from a Game instance to all its players
+    gameEmitter.on('gameEvent', (data) => {
+        this.io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
     });
 
     io.on('connection', function(socket) {

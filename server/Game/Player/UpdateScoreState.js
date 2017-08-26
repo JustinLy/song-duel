@@ -1,11 +1,11 @@
 
-class WaitGameStartState extends PlayerState {
+class UpdateScoreState extends PlayerState {
     constructor(playerController, score, displayName) {
         super(playerController, score, displayName);
         this.stateId = possibleStates.WAIT_GAME_START;
 
-        //There's no move to be made by player in this state.
-        this.madeMove = true;
+        //this.makeMove is false here because we want to wait for the client
+        //to send the READY_FOR_NEXT_ROUND event after they've had time to view results
     }
 
     updateState(gameData) {

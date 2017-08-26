@@ -5,7 +5,7 @@ let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
 let serverController = require('controllers/ServerController.js');
-serverController.init();
+serverController.init(io);
 
 let routes = require('router.js');
 routes(app);

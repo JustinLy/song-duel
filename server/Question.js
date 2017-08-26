@@ -15,10 +15,15 @@ class Question {
         this.songOptions = songOptions;
 
         this.correctSong = correctSong;
+
+        //Denotes whether question has already been answered correctly. Used to make sure only 1 player can get a point for answering
+        this.isAnswered = false;
     }
 
-    answerCorrect(answerSongId) {
-        return answerSongId === correctSong.id;
+    checkAnswer(answerSongId) {
+        let isCorrect = answerSongId === correctSong.id;
+        this.isAnswered = this.isAnswered ? this.isAnswered : isCorrect;
+        return isCorrect;
     }
 }
 

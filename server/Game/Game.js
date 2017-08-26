@@ -1,5 +1,5 @@
 const WaitGameStartState = require('Game/Player/WaitSongState.js');
-const PlayerStates = require('States.js');
+const GameEvents = require('events/GameEvents.js');
 const SpotifyService = require('services/SpotifyService.js');
 const Song = require('Song.js');
 const Question = require('Question.js');
@@ -36,8 +36,14 @@ class Game {
         this.playerMap.put(playerId, playerState);
 
         //Notify all players that a new player joined and pass updated player list.
-        let playersList = Array.from(this.playerMap.values(), state => state.displayName);
-        playerController.notifyPlayerJoined(playersList);
+        let playerList = Array.from(this.playerMap.values(), state => state.displayName);
+        this.gameEmitter.emit("gameEvent", {
+            eventId : GameEvents.NEW_PLAYER,
+            gameId : this.gameId,
+            eventData : {
+                playerList : playerList
+            }
+        });
 
         if (_allPlayersReady()) {
             console.log("Got enough players, let's start");
@@ -53,7 +59,9 @@ class Game {
      * method.
      * @param {String} songId 
      */
-    onSongSelected(songId) {
+    onSongSelected(songId, playerId) {
+        this.playerMap.get(playerId).madeMove();
+
         SpotifyService.getSong(songId).then((song) => {
             return SpotifyService.getRecommendedSongs(song, 3).then((recommendedSongs) => {
                 //Save this as it will be needed to check player answers later.
@@ -63,8 +71,8 @@ class Game {
                         songOptions : this.currentQuestion.songOptions,
                         previewUrl : song.previewUrl
                 }
-                this._forEachPlayer((playerState) => {
-                    playerState.updateState(gameState);
+                this.playerMap.forEach((id, playerState) => {
+                    this.playerMap.set(id, playerState.updateState(gameState));
                 });
             })
         })
@@ -83,35 +91,79 @@ class Game {
      * @param {String} playerId 
      */
     onAnswered(songId, playerId) {
-        if (!this.answeredCorrectly) {
-            this.answeredCorrectly = new Map();
-        }
+        let answeringPlayer = this.playerMap.get(playerId);
+        answeringPlayer.madeMove();
 
-        //Record whether player answered correctly. If player wins, set gameWinner to player display name
-        let gameWinner = null;
-        if (this.currentQuestion.answerCorrect(songId)) {
-            this.answeredCorrectly.set(playerId, true);
-            gameWinner = this.playerMap.get(playerId).getScore() === endScore - 1 ? 
-                this.playerMap.get(playerId).getDisplayName() : gameWinner;
-        } else {
-            this.answeredCorrectly.set(playerId, false);
-        }
+        //If another player beat this one to it, we do nothing.
+        if (!this.currentQuestion.isAnswered()) {
+            let isCorrect = this.currentQuestion.checkAnswer(songId)
+            if (isCorrect) {
+                answeringPlayer.addScore();
+            }
 
-        //Every player except player who asked the question has answered, or a player won
-        if (this.answeredCorrectly.size === numPlayers - 1 || gameWinner) {
-            let gameState = {
-                answeredCorrectly : this.answeredCorrectly,
-                gameWinner : gameWinner
-            };
-            this._forEachPlayer((playerState) => {
-                playerState.updateState(gameState);
+            //Broadcast this player's answer to all other players to see
+            this.gameEmitter.emit("gameEvent", {
+                eventId : GameEvents.NEW_ANSWER,
+                gameId : this.gameId,
+                eventData : {
+                    displayName : answeringPlayer.getDisplayName(),
+                    answerSongId : songId,
+                    isCorrect : isCorrect
+                }
             });
 
-            //Clear answerdCorrecty map for next round since we're moving to next turn
-            this.answeredCorrectly = null;
+            //Update all player states to move the game forward
+            if (isCorrect || this._allPlayerMovesMade()) {
+                //Create map of <Display name, score> 
+                let scoreMap = new Map();
+                this.playerMap.forEach((id, playerState) => {
+                    scoreMap.set(playerState.getDisplayName(), playerState.getScore());
+                });
 
-            if (gameWinner) {
-                gameEmitter.emit("gameOver", {gameId : this.gameId});
+                let gameState = {
+                    scoreboard : scoreMap,
+                    correctSong : this.currentQuestion.correctSong
+                }
+
+                this.playerMap.forEach((id, playerState) => {
+                    this.playerMap.set(id, playerState.updateState(gameState));
+                });
+            }
+        }
+    }
+
+    onReadyForNextRound(playerId) {
+        this.playerMap.get(playerId).madeMove();
+
+        if (this._allPlayerMovesMade()) {
+            //Check if a player has won
+            let winner = null;
+            for (playerState of this.playerMap.values()) {
+                if (playerState.getScore() === this.endScore) {
+                    winner = playerState.getDisplayName();
+                    break;
+                }
+            }
+
+            if (winner) {
+                gameEmitter.emit("gameover", {
+                    eventId : GameEvents.PLAYER_WON,
+                    gameId : this.gameId,
+                    eventData : {
+                        winner : winner
+                    }
+                });
+            } else {
+                //Set next player to choose a song
+                this.indexOfChooser = (this.indexOfChooser + 1) % this.numPlayers;
+
+                let index = 0;
+                this.playerMap.forEach((id, playerState) => {
+                    this.playerMap.set(id, playerState.updateState({
+                         isChoosingSong : index === this.indexOfChooser                
+                    }));
+                    index++;
+                });        
             }
         }
     }
@@ -128,14 +180,29 @@ class Game {
 
     _startGame() {
         //Pick a random player to be the first to choose a song. All others will wait to answer.
-        let indexOfChooser = this.numPlayers * Math.random() + 1;
+        this.indexOfChooser = this.numPlayers * Math.random();
 
-        this._forEachPlayer((playerState, index) => {
-            if (index == indexOfChooser) console.log(playerState.playerId + " is attacking first");
-            playerState.updateState({
-                isChoosingSong : index === indexOfChooser
-            });
-        });
+        let index = 0;
+        this.playerMap.forEach((id, playerState) => {
+            this.playerMap.set(id, playerState.updateState({
+                isChoosingSong : index === this.indexOfChooser                
+            }));
+            index++;
+        }); 
+    }
+
+    /**
+     * Check if all players have made their move for current state.
+     * This is a helper to determine if we can update all player states
+     * or if we're still waiting on input from some players.
+     */
+    _allPlayerMovesMade() {
+        for (state of this.playerMap.values()) {
+            if (!state.hasMadeMove()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -154,7 +221,7 @@ class Game {
         }
 
         return Array.from(this.playerMap.values()).every(playerState => {
-            return playerState.stateId === PlayerStates.WAIT_GAME_START;
+            return playerState.stateId === GameEvents.WAIT_GAME_START;
         });
     }
 
