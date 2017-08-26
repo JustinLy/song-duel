@@ -15,11 +15,20 @@ class PlayerState {
         return this.displayName;
     }
 
+    get score() {
+        return this.score;
+    }
+
     updateState(gameData) {
         //TODO: do stuff with gameData, format, extract, whatever
         //TODO: instantiate new state
         //TODO: send update to playerController of new state
         throw new Error("Child state must implement this method");
+    }
+
+    destroy() {
+        this.playerController.destroy();
+        this.playerController = null;
     }
 }
 

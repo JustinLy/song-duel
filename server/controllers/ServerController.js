@@ -3,13 +3,24 @@
 const uuidv4 = require('uuid/v4');
 const Game = require('Game/Game.js');
 const PlayerController = require('controllers/PlayerController.js');
+const EventEmitter = require('events').EventEmitter;
 
 let gameMap = new Map();
-
+let gameEmitter = null;
 /**
  * Get server ready to listen to incoming socket connections (players joining games)
  */
 exports.init = function(io) {
+    gameEmitter = new EventEmitter();
+    //Destroy game if it has ended.
+    gameEmitter.on('gameOver', (data) => {
+        let currentGame = data.gameId ? this.gameMap.get(data.gameId) : null;
+        if (currentGame) {
+            currentGame.destroy();
+            this.gameMap.delete(gameId);
+        }
+    });
+
     io.on('connection', function(socket) {
         console.log('a user connected to the server');
 
@@ -44,7 +55,7 @@ exports.newGame = function(request, response) {
     let numPlayers = 2; //Change this to a variable passed in request if you decide to support more players.
     const gameId = uuidv4();
     const playerId = uuidv4();
-    gameMap.set(gameId, new Game(gameId, numPlayers));
+    gameMap.set(gameId, new Game(gameId, numPlayers, request.params.endScore, gameEmitter));
 
     console.log("made a new game id: " + gameId);
     console.log("made new player id: " + playerId);

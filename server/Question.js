@@ -17,7 +17,7 @@ class Question {
         this.correctSong = correctSong;
     }
 
-    checkAnswer(answerSongId) {
+    answerCorrect(answerSongId) {
         return answerSongId === correctSong.id;
     }
 }

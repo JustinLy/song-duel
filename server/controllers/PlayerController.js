@@ -24,6 +24,11 @@ class PlayerController {
     updateState(newStateId, gameData) {
         this.socket.emit(newStateId, gameData);
     }
+
+    destroy() {
+        this.socket.close();
+        this.game = null;
+    }
 }
 
 module.exports = PlayerController;
