@@ -1,4 +1,4 @@
-let possibleStates = require("events/GameEvents.js");
+const possibleStates = require("events/GameEvents.js");
 
 class PlayerState {
     constructor(playerController, score, displayName) {

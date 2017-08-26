@@ -95,7 +95,7 @@ class Game {
         answeringPlayer.madeMove();
 
         //If another player beat this one to it, we do nothing.
-        if (!this.currentQuestion.isAnswered()) {
+        if (!this.currentQuestion.isAnswered) {
             let isCorrect = this.currentQuestion.checkAnswer(songId)
             if (isCorrect) {
                 answeringPlayer.addScore();
@@ -132,6 +132,12 @@ class Game {
         }
     }
 
+    /**
+     * Player is ready for next round. Check if all players are ready
+     * , check if a player has won, determine next player to choose song,
+     * and then update player states.
+     * @param {*String} playerId 
+     */
     onReadyForNextRound(playerId) {
         this.playerMap.get(playerId).madeMove();
 
@@ -205,13 +211,6 @@ class Game {
         return true;
     }
 
-    /**
-     * Helper to call a function on each player state.
-     * @param  action - a callback function to call on each player state
-     */
-    _forEachPlayer(action) {
-        Array.from(this.playerMap.values()).forEach(action);
-    }
     /**
      * Helper to check if there are enough players to start and all players are in a ready state.
      */

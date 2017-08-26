@@ -1,4 +1,5 @@
-let PlayerState = require('Game/Player/PlayerState.js');
+const PlayerState = require('Game/Player/PlayerState.js');
+const UpdateScoreState = require('Game/Player/UpdateScoreState.js');
 
 class DisplaySongWaitState extends PlayerState {
     constructor(playerController, score, displayName) {
