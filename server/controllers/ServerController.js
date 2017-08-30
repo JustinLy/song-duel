@@ -41,13 +41,16 @@ exports.init = function(socketIo) {
             console.log('user joined ' + data.gameId);
             joinedGame = gameMap.get(data.gameId);
 
+            //Generate new player ID for player
+            const playerId = uuidv4();
+
             //Attach game and player info to socket and add it to room
             socket.gameId = data.gameId;
-            socket.playerId = data.playerId;
+            socket.playerId = playerId;
             socket.join(data.gameId);
 
             playerController = new PlayerController(socket, joinedGame);
-            joinedGame.addPlayer(playerController, data.displayName, data.playerId);
+            joinedGame.addPlayer(playerController, data.displayName, playerId);
         });
 
         socket.on('disconect', function(data) {
@@ -66,16 +69,12 @@ exports.init = function(socketIo) {
 exports.newGame = function(request, response) {
     let numPlayers = 2; //Change this to a variable passed in request if you decide to support more players.
     const gameId = uuidv4();
-    const playerId = uuidv4();
     gameMap.set(gameId, new Game(gameId, numPlayers, request.params.endScore, gameEmitter));
 
     console.log("made a new game id: " + gameId);
-    console.log("made new player id: " + playerId);
     response.send({
         "gameId" : gameId,
-        "playerId" : playerId,
         "joinUrl" : request.protocol + '://' + request.get('host') + '/joinGame/' + gameId
-
     });
 }
 
