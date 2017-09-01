@@ -69,6 +69,7 @@ class Home extends Component {
 
     onJoinOk() {
         console.log("joining game");
+        this.props.history.push(`/game/${this.state.gameId}`);
     }
 
     render() {
