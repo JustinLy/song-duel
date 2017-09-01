@@ -11,17 +11,17 @@ class PlayerState {
         this.madeMove = false;
     }
 
-    get possibleStates() {
-        return possibleStates;
-    }
+    // get possibleStates() {
+    //     return possibleStates;
+    // }
 
-    get displayName() {
-        return this.displayName;
-    }
+    // get displayName() {
+    //     return this.displayName;
+    // }
 
-    get score() {
-        return this.score;
-    }
+    // get score() {
+    //     return this.score;
+    // }
 
     addPoint() {
         this.score++;

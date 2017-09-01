@@ -1,4 +1,4 @@
-const WaitGameStartState = require('Game/Player/WaitSongState.js');
+const WaitGameStartState = require('Game/Player/WaitGameStartState.js');
 const GameEvents = require('events/GameEvents.js');
 const SpotifyService = require('services/SpotifyService.js');
 const Song = require('Song.js');
@@ -33,23 +33,23 @@ class Game {
      */
     addPlayer(playerController, displayName, playerId) {
         let playerState = new WaitGameStartState(playerController, 0, displayName);
-        this.playerMap.put(playerId, playerState);
+        this.playerMap.set(playerId, playerState);
 
-        //Notify all players that a new player joined and pass updated player list.
-        let playerList = Array.from(this.playerMap.values(), state => state.displayName);
+        //Notify all players that a new player joined and pass map of <displayName, score>.
+        let scoreMap = this._getScoreMap();
         this.gameEmitter.emit("gameEvent", {
-            eventId : GameEvents.NEW_PLAYER,
-            gameId : this.gameId,
-            eventData : {
-                playerList : playerList
+            eventId: GameEvents.NEW_PLAYER,
+            gameId: this.gameId,
+            eventData: {
+                scoreMap: scoreMap
             }
         });
 
-        if (_allPlayersReady()) {
-            console.log("Got enough players, let's start");
-            _startGame();
+        if (this._allPlayersReady()) {
+            console.log(this.gameId + " has Got enough players, let's start");
+            this._startGame();
         }
-        
+
     }
 
     /**
@@ -66,12 +66,12 @@ class Game {
             return SpotifyService.getRecommendedSongs(song, 3).then((recommendedSongs) => {
                 //Save this as it will be needed to check player answers later.
                 this.currentQuestion = new Question(recommendedSongs, song);
-                
+
                 let gameState = {
-                        songOptions : this.currentQuestion.songOptions,
-                        previewUrl : song.previewUrl
+                    songOptions: this.currentQuestion.songOptions,
+                    previewUrl: song.previewUrl
                 }
-                this.playerMap.forEach((id, playerState) => {
+                this.playerMap.forEach((playerState, id) => {
                     this.playerMap.set(id, playerState.updateState(gameState));
                 });
             })
@@ -103,29 +103,26 @@ class Game {
 
             //Broadcast this player's answer to all other players to see
             this.gameEmitter.emit("gameEvent", {
-                eventId : GameEvents.NEW_ANSWER,
-                gameId : this.gameId,
-                eventData : {
-                    displayName : answeringPlayer.getDisplayName(),
-                    answerSongId : songId,
-                    isCorrect : isCorrect
+                eventId: GameEvents.NEW_ANSWER,
+                gameId: this.gameId,
+                eventData: {
+                    displayName: answeringPlayer.displayName,
+                    answerSongId: songId,
+                    isCorrect: isCorrect
                 }
             });
 
             //Update all player states to move the game forward
             if (isCorrect || this._allPlayerMovesMade()) {
                 //Create map of <Display name, score> 
-                let scoreMap = new Map();
-                this.playerMap.forEach((id, playerState) => {
-                    scoreMap.set(playerState.getDisplayName(), playerState.getScore());
-                });
+                let scoreMap = this._getScoreMap();
 
                 let gameState = {
-                    scoreboard : scoreMap,
-                    correctSong : this.currentQuestion.correctSong
+                    scoreboard: scoreMap,
+                    correctSong: this.currentQuestion.correctSong
                 }
 
-                this.playerMap.forEach((id, playerState) => {
+                this.playerMap.forEach((playerState, id) => {
                     this.playerMap.set(id, playerState.updateState(gameState));
                 });
             }
@@ -145,18 +142,18 @@ class Game {
             //Check if a player has won
             let winner = null;
             for (playerState of this.playerMap.values()) {
-                if (playerState.getScore() === this.endScore) {
-                    winner = playerState.getDisplayName();
+                if (playerState.score === this.endScore) {
+                    winner = playerState.displayName
                     break;
                 }
             }
 
             if (winner) {
                 gameEmitter.emit("gameover", {
-                    eventId : GameEvents.PLAYER_WON,
-                    gameId : this.gameId,
-                    eventData : {
-                        winner : winner
+                    eventId: GameEvents.PLAYER_WON,
+                    gameId: this.gameId,
+                    eventData: {
+                        winner: winner
                     }
                 });
             } else {
@@ -164,18 +161,18 @@ class Game {
                 this.indexOfChooser = (this.indexOfChooser + 1) % this.numPlayers;
 
                 let index = 0;
-                this.playerMap.forEach((id, playerState) => {
+                this.playerMap.forEach((playerState, id) => {
                     this.playerMap.set(id, playerState.updateState({
-                         isChoosingSong : index === this.indexOfChooser                
+                        isChoosingSong: index === this.indexOfChooser
                     }));
                     index++;
-                });        
+                });
             }
         }
     }
-    
+
     destroy() {
-        this.playerMap.forEach((id, state) => {
+        this.playerMap.forEach((state, id) => {
             state.destroy();
         });
         this.playerMap.clear();
@@ -184,17 +181,28 @@ class Game {
         this.gameEmitter = null;
     }
 
+    _getScoreMap() {
+        let scoreMap = [];
+        this.playerMap.forEach((playerState, id) => {
+            scoreMap.push({
+                displayName: playerState.displayName,
+                score: playerState.score
+            });
+        });
+        return scoreMap;
+    }
+
     _startGame() {
         //Pick a random player to be the first to choose a song. All others will wait to answer.
         this.indexOfChooser = this.numPlayers * Math.random();
 
         let index = 0;
-        this.playerMap.forEach((id, playerState) => {
+        this.playerMap.forEach((playerState, id) => {
             this.playerMap.set(id, playerState.updateState({
-                isChoosingSong : index === this.indexOfChooser                
+                isChoosingSong: index === this.indexOfChooser
             }));
             index++;
-        }); 
+        });
     }
 
     /**

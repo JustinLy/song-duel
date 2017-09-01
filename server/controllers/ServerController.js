@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 const Game = require('Game/Game.js');
 const PlayerController = require('controllers/PlayerController.js');
 const EventEmitter = require('events').EventEmitter;
+const PlayerEvents = require('events/PlayerEvents.js');
 
 let gameMap = null;
 let gameEmitter = null;
@@ -11,7 +12,7 @@ let io = null;
 /**
  * Get server ready to listen to incoming socket connections (players joining games)
  */
-exports.init = function(socketIo) {
+exports.init = function (socketIo) {
     io = socketIo;
     gameMap = new Map();
     gameEmitter = new EventEmitter();
@@ -19,7 +20,7 @@ exports.init = function(socketIo) {
     //Destroy game if it has ended.
     gameEmitter.on('gameOver', (data) => {
         //Broadcast the gameover event to players. eventId will be the reason why game ended
-        this.io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
+        io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
 
         let currentGame = data.gameId ? this.gameMap.get(data.gameId) : null;
         if (currentGame) {
@@ -30,16 +31,16 @@ exports.init = function(socketIo) {
 
     //Used to broadcast events from a Game instance to all its players
     gameEmitter.on('gameEvent', (data) => {
-        this.io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
+        io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
     });
 
-    io.on('connection', function(socket) {
+    io.on('connection', function (socket) {
         console.log('a user connected to the server');
 
         //New player joins a game
-        socket.on('join', function(data) {
+        socket.on(PlayerEvents.JOIN, function (data) {
             console.log('user joined ' + data.gameId);
-            joinedGame = gameMap.get(data.gameId);
+            let joinedGame = gameMap.get(data.gameId);
 
             //Generate new player ID for player
             const playerId = uuidv4();
@@ -49,11 +50,11 @@ exports.init = function(socketIo) {
             socket.playerId = playerId;
             socket.join(data.gameId);
 
-            playerController = new PlayerController(socket, joinedGame);
+            let playerController = new PlayerController(socket, joinedGame);
             joinedGame.addPlayer(playerController, data.displayName, playerId);
         });
 
-        socket.on('disconect', function(data) {
+        socket.on('disconect', function (data) {
             //TODO: Check if game player belonged to is now empty and delete it if so
         });
     });
@@ -66,15 +67,15 @@ exports.init = function(socketIo) {
  * and join event with gameId and playerId they receive. A player isn't considered to be
  * "in a game" until they've conected via a socket.
  */
-exports.newGame = function(request, response) {
+exports.newGame = function (request, response) {
     let numPlayers = 2; //Change this to a variable passed in request if you decide to support more players.
     const gameId = uuidv4();
     gameMap.set(gameId, new Game(gameId, numPlayers, request.params.endScore, gameEmitter));
 
     console.log("made a new game id: " + gameId);
     response.send({
-        "gameId" : gameId,
-        "joinUrl" : request.protocol + '://' + request.get('host') + '/joinGame/' + gameId
+        "gameId": gameId,
+        "joinUrl": request.protocol + '://' + request.get('host') + '/joinGame/' + gameId
     });
 }
 
@@ -83,7 +84,7 @@ exports.newGame = function(request, response) {
  * returns the gameId. The client must still initiate a socket connection and join with
  * the given gameId and playerId to actually join the game, similar to newGame.
  */
-exports.joinGame = function(request, response) {
+exports.joinGame = function (request, response) {
     let gameId = request.params.gameId;
     let game = gameMap.get(gameId);
     if (!game) {
@@ -96,7 +97,7 @@ exports.joinGame = function(request, response) {
     console.log("made new player id: " + playerId);
 
     response.send({
-        "gameId" : gameId,
-        "playerId" : playerId
+        "gameId": gameId,
+        "playerId": playerId
     });
 }

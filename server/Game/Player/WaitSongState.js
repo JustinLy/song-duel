@@ -1,5 +1,6 @@
 let PlayerState = require('Game/Player/PlayerState.js');
 const DisplaySongAnswerState = require('Game/Player/DisplaySongAnswerState.js');
+const possibleStates = require("events/GameEvents.js");
 
 class WaitSongState extends PlayerState {
     constructor(playerController, score, displayName) {
@@ -16,3 +17,5 @@ class WaitSongState extends PlayerState {
         return newState;
     }
 }
+
+module.exports = WaitSongState;
