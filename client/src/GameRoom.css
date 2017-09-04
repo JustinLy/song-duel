@@ -1,0 +1,14 @@
+.Scoreboard {
+    border-style: solid;
+    border-width: 1px;
+    border-color: blue;
+}
+
+.GameContainer {
+    float:left;
+    width:75%
+}
+
+.Room {
+    height:100%
+}

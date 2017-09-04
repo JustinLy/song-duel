@@ -9,6 +9,7 @@
     "express": "^4.15.4",
     "get-root-path": "^2.0.2",
     "jasmine": "^2.7.0",
+    "muicss": "^0.9.24",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4",
     "shuffle-array": "^1.0.1",

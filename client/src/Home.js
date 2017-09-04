@@ -37,7 +37,9 @@ class Home extends Component {
         })
     }
 
-    onDialogOk() {
+    onDialogOk(e) {
+        e.preventDefault();
+
         DuelService.createNewGame(this.state.endScore).then((gameId) => {
             this.setState({
                 joinDialogOpen: true,
@@ -49,7 +51,10 @@ class Home extends Component {
         });
     }
 
-    onDialogCancel() {
+    onDialogCancel(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
         this.setState({
             newGameDialogOpen: false
         });
