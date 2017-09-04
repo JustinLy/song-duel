@@ -194,7 +194,7 @@ class Game {
 
     _startGame() {
         //Pick a random player to be the first to choose a song. All others will wait to answer.
-        this.indexOfChooser = this.numPlayers * Math.random();
+        this.indexOfChooser = Math.floor(this.numPlayers * Math.random());
 
         let index = 0;
         this.playerMap.forEach((playerState, id) => {

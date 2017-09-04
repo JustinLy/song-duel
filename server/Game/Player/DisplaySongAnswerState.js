@@ -5,7 +5,7 @@ const possibleStates = require("events/GameEvents.js");
 class DisplaySongAnswerState extends PlayerState {
     constructor(playerController, score, displayName) {
         super(playerController, score, displayName);
-        this.stateId = possibleStates.ChooseSongState;
+        this.stateId = possibleStates.DISPLAY_SONG_ANSWER;
     }
 
     updateState(gameData) {
