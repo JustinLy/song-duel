@@ -4,14 +4,14 @@
 require('dotenv').config();
 
 const credentials = {
-  client : {
-    id: process.env.client_id,
-    secret: process.env.client_secret
-  },
-  auth : {
-    tokenHost : "https://accounts.spotify.com",
-    tokenPath : "/api/token"
-  }
+    client: {
+        id: process.env.client_id,
+        secret: process.env.client_secret
+    },
+    auth: {
+        tokenHost: "https://accounts.spotify.com",
+        tokenPath: "/api/token"
+    }
 };
 
 const oauth2 = require('simple-oauth2').create(credentials);
@@ -24,14 +24,14 @@ let accessToken = null;
  * Retrieve all of a song's metadata from Spotify API with the given songId and return a Song object with
  * containing relevant fields.
  */
-exports.getSong = function(songId) {
+exports.getSong = function (songId) {
     return ensureAccessToken().then(() => {
         return request({
-            uri : `https://api.spotify.com/v1/tracks/${songId}`,
+            uri: `https://api.spotify.com/v1/tracks/${songId}`,
             headers: {
-                'Authorization' : "Bearer " + accessToken.token.access_token,
+                'Authorization': "Bearer " + accessToken.token.access_token,
             },
-            json:true
+            json: true
         }).then((songData) => {
             return new Song(songData);
         }).catch(error => {
@@ -45,7 +45,7 @@ exports.getSong = function(songId) {
  * Returns a list of songs of size 'limit' that are similar to the given song
  * using Spotify's Recommendations API.
  */
-exports.getRecommendedSongs = function(song, limit) {
+exports.getRecommendedSongs = function (song, limit) {
     return ensureAccessToken().then(() => {
         let seedParams = {};
         seedParams['seed_tracks'] = song.id;
@@ -62,13 +62,13 @@ exports.getRecommendedSongs = function(song, limit) {
         seedParams['seed_artists'] = artistsParam;
 
         return request({
-            method : 'GET',
-            uri : "https://api.spotify.com/v1/recommendations",
-            qs : seedParams,
-            headers : {
-                'Authorization' : "Bearer " + accessToken.token.access_token,
+            method: 'GET',
+            uri: "https://api.spotify.com/v1/recommendations",
+            qs: seedParams,
+            headers: {
+                'Authorization': "Bearer " + accessToken.token.access_token,
             },
-            json : true,
+            json: true,
         }).then((data) => {
             return (data.tracks || []).map((songData) => {
                 return new Song(songData);
@@ -76,6 +76,32 @@ exports.getRecommendedSongs = function(song, limit) {
         }).catch((error) => {
             console.log("Spotify get recommendations error", error.message);
             throw error;
+        });
+    });
+}
+
+exports.search = function (query) {
+    return ensureAccessToken().then(() => {
+        return request({
+            method: 'GET',
+            uri: 'https://api.spotify.com/v1/search',
+            qs: {
+                q: query,
+                type: 'track'
+            },
+            headers: {
+                Authorization: `Bearer ${accessToken.token.access_token}`
+            },
+            json: true
+        }).then((data) => {
+            return ((data.tracks || {}).items || []).reduce((songs, trackInfo) => {
+                if (trackInfo.preview_url) {
+                    songs.push(new Song(trackInfo));
+                }
+                return songs;
+            }, []);
+        }).catch((error) => {
+            console.log("Error searching spotify ", error.message);
         });
     });
 }
@@ -98,4 +124,4 @@ function ensureAccessToken() {
         return new Promise((resolve, reject) => resolve());
     }
 }
- 
+
