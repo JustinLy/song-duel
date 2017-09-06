@@ -60,7 +60,7 @@ class Game {
      * @param {String} songId 
      */
     onSongSelected(songId, playerId) {
-        this.playerMap.get(playerId).madeMove();
+        this.playerMap.get(playerId).makeMove();
 
         SpotifyService.getSong(songId).then((song) => {
             return SpotifyService.getRecommendedSongs(song, 3).then((recommendedSongs) => {
@@ -68,8 +68,10 @@ class Game {
                 this.currentQuestion = new Question(recommendedSongs, song);
 
                 let gameState = {
-                    songOptions: this.currentQuestion.songOptions,
-                    previewUrl: song.previewUrl
+                    question: {
+                        songOptions: this.currentQuestion.songOptions,
+                        previewUrl: song.previewUrl
+                    }
                 }
                 this.playerMap.forEach((playerState, id) => {
                     this.playerMap.set(id, playerState.updateState(gameState));
@@ -92,7 +94,7 @@ class Game {
      */
     onAnswered(songId, playerId) {
         let answeringPlayer = this.playerMap.get(playerId);
-        answeringPlayer.madeMove();
+        answeringPlayer.makeMove();
 
         //If another player beat this one to it, we do nothing.
         if (!this.currentQuestion.isAnswered) {
@@ -136,7 +138,7 @@ class Game {
      * @param {*String} playerId 
      */
     onReadyForNextRound(playerId) {
-        this.playerMap.get(playerId).madeMove();
+        this.playerMap.get(playerId).makeMove();
 
         if (this._allPlayerMovesMade()) {
             //Check if a player has won

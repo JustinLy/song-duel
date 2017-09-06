@@ -27,7 +27,7 @@ class PlayerState {
         this.score++;
     }
 
-    madeMove() {
+    makeMove() {
         this.madeMove = true;
     }
 

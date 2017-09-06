@@ -36,13 +36,16 @@ class GameRoom extends Component {
             nameDialogOpen: true,
             displayName: "",
             turnDescription: "Waiting for all players to join",
-            searchEnabled: false
+            choosingSong: false,
+            question: null,
+            answering: false
         }
 
         this.onDialogCancel = this.onDialogCancel.bind(this);
         this.onDialogOk = this.onDialogOk.bind(this);
         this.onDisplayNameChange = this.onDisplayNameChange.bind(this);
         this.onSongSelected = this.onSongSelected.bind(this);
+        this.onAnswer = this.onAnswer.bind(this);
     }
 
     componentDidMount() {
@@ -50,6 +53,8 @@ class GameRoom extends Component {
         GameService.onEvent(GameEvents.NEW_PLAYER, this.onNewPlayer.bind(this));
         GameService.onEvent(GameEvents.CHOOSE_SONG, this.onChooseSong.bind(this));
         GameService.onEvent(GameEvents.WAIT_SONG, this.onWaitSong.bind(this));
+        GameService.onEvent(GameEvents.DISPLAY_SONG_ANSWER, this.onDisplayQuestionAnswer.bind(this));
+        GameService.onEvent(GameEvents.DISPLAY_SONG_WAIT, this.onDisplayQuestionWait.bind(this));
     }
 
     /********** Define socket game event handlers **********/
@@ -63,7 +68,7 @@ class GameRoom extends Component {
     onChooseSong(data) {
         this.setState({
             turnDescription: TurnDescriptions.getDescription(GameEvents.CHOOSE_SONG),
-            searchEnabled: true
+            choosingSong: true
         });
     }
 
@@ -76,6 +81,22 @@ class GameRoom extends Component {
     onDisplayNameChange(event) {
         this.setState({
             displayName: event.target.value
+        });
+    }
+
+    onDisplayQuestionAnswer(data) {
+        this.setState({
+            turnDescription: TurnDescriptions.getDescription(GameEvents.DISPLAY_SONG_ANSWER),
+            question: data.question,
+            answering: true
+        });
+    }
+
+    onDisplayQuestionWait(data) {
+        this.setState({
+            turnDescription: TurnDescriptions.getDescription(GameEvents.DISPLAY_SONG_WAIT),
+            question: data.question,
+            answering: false
         });
     }
 
@@ -109,9 +130,18 @@ class GameRoom extends Component {
 
     onSongSelected(songId) {
         this.setState({
-            searchEnabled: false
+            choosingSong: false
         });
-        GameService.sendEvent(GameEvents.SELECTED_SONG, {
+        GameService.sendEvent(PlayerEvents.SELECTED_SONG, {
+            songId: songId
+        });
+    }
+
+    onAnswer(songId) {
+        this.setState({
+            answering: false
+        });
+        GameService.sendEvent(PlayerEvents.ANSWERED, {
             songId: songId
         });
     }
@@ -196,14 +226,18 @@ class GameRoom extends Component {
 
                                 <Row>
                                     <Col md="12">
-                                        <QuestionPanel />
+                                        <QuestionPanel
+                                            question={this.state.question}
+                                            canAnswer={this.state.answering}
+                                            onAnswer={this.onAnswer}
+                                        />
                                     </Col>
                                 </Row>
 
                                 <Row>
                                     <Col md="12">
                                         <SearchBar
-                                            enabled={this.state.searchEnabled}
+                                            enabled={this.state.choosingSong}
                                             onItemSelected={this.onSongSelected} />
                                     </Col>
                                 </Row>

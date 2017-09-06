@@ -9,7 +9,7 @@ class DisplaySongAnswerState extends PlayerState {
     }
 
     updateState(gameData) {
-        let newState = new UpdateScoreState(this.playerController, this.score, displayName);
+        let newState = new UpdateScoreState(this.playerController, this.score, this.displayName);
         newState.playerController.updateState(newState.stateId, gameData);
         return newState;
     }
