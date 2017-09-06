@@ -7,6 +7,9 @@ import PlayerEvents from '../common/PlayerEvents.js';
 import GameEvents from '../common/GameEvents.js';
 import TurnDescriptions from "./TurnDescriptions.js";
 
+import QuestionPanel from "./QuestionPanel.js";
+import SearchBar from "./SearchBar.js";
+
 import Container from 'muicss/lib/react/container';
 import Row from 'muicss/lib/react/row';
 import Col from 'muicss/lib/react/col';
@@ -32,12 +35,14 @@ class GameRoom extends Component {
             gameId: props.match.params.gameId,
             nameDialogOpen: true,
             displayName: "",
-            turnDescription: "Waiting for all players to join"
+            turnDescription: "Waiting for all players to join",
+            searchEnabled: false
         }
 
         this.onDialogCancel = this.onDialogCancel.bind(this);
         this.onDialogOk = this.onDialogOk.bind(this);
         this.onDisplayNameChange = this.onDisplayNameChange.bind(this);
+        this.onSongSelected = this.onSongSelected.bind(this);
     }
 
     componentDidMount() {
@@ -58,7 +63,7 @@ class GameRoom extends Component {
     onChooseSong(data) {
         this.setState({
             turnDescription: TurnDescriptions.getDescription(GameEvents.CHOOSE_SONG),
-
+            searchEnabled: true
         });
     }
 
@@ -73,6 +78,8 @@ class GameRoom extends Component {
             displayName: event.target.value
         });
     }
+
+    /********** UI event handlers **********/
 
     onDialogCancel(e) {
         if (e.preventDefault) {
@@ -98,6 +105,15 @@ class GameRoom extends Component {
                 displayName: this.state.displayName
             });
         }
+    }
+
+    onSongSelected(songId) {
+        this.setState({
+            searchEnabled: false
+        });
+        GameService.sendEvent(GameEvents.SELECTED_SONG, {
+            songId: songId
+        });
     }
 
     render() {
@@ -180,7 +196,15 @@ class GameRoom extends Component {
 
                                 <Row>
                                     <Col md="12">
+                                        <QuestionPanel />
+                                    </Col>
+                                </Row>
 
+                                <Row>
+                                    <Col md="12">
+                                        <SearchBar
+                                            enabled={this.state.searchEnabled}
+                                            onItemSelected={this.onSongSelected} />
                                     </Col>
                                 </Row>
                             </Container>

@@ -9,7 +9,7 @@ class PlayerController {
 
         //Attach listeners to socket for player actions
         socket.on(actions.SELECTED_SONG, (data) => {
-            this.game.onSongSelected(data.songId);
+            this.game.onSongSelected(data.songId, this.socket.playerId);
         });
 
         socket.on(actions.ANSWERED, (data) => {
@@ -19,16 +19,15 @@ class PlayerController {
         socket.on(actions.READY_FOR_NEXT_ROUND, (data) => {
             this.game.onReadyForNextRound(this.socket.playerId);
         });
+
+        socket.on(actions.SEARCH, (data) => {
+            this.game.search(data.query).then((songs) => {
+                this.socket.emit(gameEvents.SEARCH_RESULTS, {
+                    "songs": songs
+                });
+            });
+        });
     }
-
-    //TODO: Remove these when confirmed we don't need.
-    // notifyPlayerJoined(playerList) {
-    //     this.socket.nsp.to(this.game.gameId).emit(gameEvents.NEW_PLAYER, {'playerList' : playerList});
-    // }
-
-    // notifyNewAnswer(answerSongId) {
-    //     this.socket.nsp.to(this.game.gameId).emit(gameEvents.NEW_ANSWER, {'answerSongId' : answerSongId});
-    // }
 
     updateState(newStateId, gameData) {
         this.socket.emit(newStateId, gameData);

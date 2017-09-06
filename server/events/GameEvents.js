@@ -11,4 +11,5 @@
     exports.NEW_ANSWER = "newAnswer";
     exports.PLAYER_WON = "playerWon";
     exports.PLAYER_DISCONNECTED = "playerDisconnected";
+    exports.SEARCH_RESULTS = "searchResults";
 })(typeof exports === 'undefined' ? this['GameEvents'] = {} : exports);

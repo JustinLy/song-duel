@@ -171,6 +171,10 @@ class Game {
         }
     }
 
+    search(query) {
+        return SpotifyService.search(query);
+    }
+
     destroy() {
         this.playerMap.forEach((state, id) => {
             state.destroy();
