@@ -1,5 +1,4 @@
 let PlayerState = require('Game/Player/PlayerState.js');
-const DisplaySongAnswerState = require('Game/Player/DisplaySongAnswerState.js');
 const possibleStates = require("events/GameEvents.js");
 
 class WaitSongState extends PlayerState {
@@ -12,6 +11,8 @@ class WaitSongState extends PlayerState {
     }
 
     updateState(gameData) {
+        const DisplaySongAnswerState = require('Game/Player/DisplaySongAnswerState.js');
+
         let newState = new DisplaySongAnswerState(this.playerController, this.score, this.displayName);
         newState.playerController.updateState(newState.stateId, gameData);
         return newState;

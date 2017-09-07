@@ -100,7 +100,7 @@ class Game {
         if (!this.currentQuestion.isAnswered) {
             let isCorrect = this.currentQuestion.checkAnswer(songId)
             if (isCorrect) {
-                answeringPlayer.addScore();
+                answeringPlayer.addPoint();
             }
 
             //Broadcast this player's answer to all other players to see
@@ -120,7 +120,7 @@ class Game {
                 let scoreMap = this._getScoreMap();
 
                 let gameState = {
-                    scoreboard: scoreMap,
+                    scoreMap: scoreMap,
                     correctSong: this.currentQuestion.correctSong
                 }
 

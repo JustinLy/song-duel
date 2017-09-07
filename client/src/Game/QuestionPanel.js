@@ -4,10 +4,47 @@ import Row from 'muicss/lib/react/row';
 import Col from 'muicss/lib/react/col';
 import '../GameRoom.css';
 import SongButton from './SongButton.js';
+import GameService from '../services/GameService.js';
+import PlayerEvents from '../common/PlayerEvents.js';
+import GameEvents from '../common/GameEvents.js';
 
 class QuestionPanel extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            currentAnswer: null
+        }
+
+        this.onNewAnswer = this.onNewAnswer.bind(this);
+        this.getAnswerColor = this.getAnswerColor.bind(this);
+    }
+
+    componentDidMount() {
+        GameService.onEvent(GameEvents.NEW_ANSWER, this.onNewAnswer);
+    }
+
+    onNewAnswer(answer) {
+        let tempAnswer = answer;
+        //Set current answer, but after 1000ms reset to null if it has not changed. This is so the color highlight only lasts 1000ms per new answer.
+        this.setState({
+            currentAnswer: answer
+        }, () => {
+            setTimeout(() => {
+                if (this.state.currentAnswer && tempAnswer.answerSongId === this.state.currentAnswer.answerSongId) {
+                    this.setState({
+                        currentAnswer: null
+                    });
+                }
+            }, 1000);
+        });
+    }
+
+    getAnswerColor(song) {
+        if (this.state.currentAnswer && song.id === this.state.currentAnswer.answerSongId) {
+            return this.state.currentAnswer.isCorrect ? "lightgreen" : "red";
+        } else {
+            return "transparent";
+        }
     }
 
     render() {
@@ -25,6 +62,7 @@ class QuestionPanel extends Component {
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[0]}
                                 onAnswer={this.props.onAnswer}
+                                color={this.getAnswerColor(this.props.question.songOptions[0])}
                             />
                         </Col>
 
@@ -33,6 +71,7 @@ class QuestionPanel extends Component {
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[1]}
                                 onAnswer={this.props.onAnswer}
+                                color={this.getAnswerColor(this.props.question.songOptions[1])}
                             />
                         </Col>
                     </Row>
@@ -43,6 +82,7 @@ class QuestionPanel extends Component {
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[2]}
                                 onAnswer={this.props.onAnswer}
+                                color={this.getAnswerColor(this.props.question.songOptions[2])}
                             />
                         </Col>
 
@@ -51,6 +91,7 @@ class QuestionPanel extends Component {
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[3]}
                                 onAnswer={this.props.onAnswer}
+                                color={this.getAnswerColor(this.props.question.songOptions[3])}
                             />
                         </Col>
                     </Row>

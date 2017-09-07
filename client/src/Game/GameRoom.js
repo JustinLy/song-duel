@@ -55,6 +55,7 @@ class GameRoom extends Component {
         GameService.onEvent(GameEvents.WAIT_SONG, this.onWaitSong.bind(this));
         GameService.onEvent(GameEvents.DISPLAY_SONG_ANSWER, this.onDisplayQuestionAnswer.bind(this));
         GameService.onEvent(GameEvents.DISPLAY_SONG_WAIT, this.onDisplayQuestionWait.bind(this));
+        GameService.onEvent(GameEvents.UPDATE_SCORE, this.onUpdateScore.bind(this));
     }
 
     /********** Define socket game event handlers **********/
@@ -98,6 +99,17 @@ class GameRoom extends Component {
             question: data.question,
             answering: false
         });
+    }
+
+    onUpdateScore(data) {
+        this.setState({
+            scoreMap: data.scoreMap
+        }, () => {
+            setTimeout(() => {
+                GameService.sendEvent(PlayerEvents.READY_FOR_NEXT_ROUND, {});
+            }, 2000);
+        });
+
     }
 
     /********** UI event handlers **********/

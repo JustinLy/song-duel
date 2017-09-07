@@ -21,7 +21,7 @@ class Question {
     }
 
     checkAnswer(answerSongId) {
-        let isCorrect = answerSongId === correctSong.id;
+        let isCorrect = answerSongId === this.correctSong.id;
         this.isAnswered = this.isAnswered ? this.isAnswered : isCorrect;
         return isCorrect;
     }

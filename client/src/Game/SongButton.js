@@ -11,7 +11,7 @@ class SongButton extends Component {
         let style = {
             width: "20vh",
             height: "10vh",
-            "line-height": "138%",
+            "lineHeight": "138%",
 
         }
         return (
@@ -22,7 +22,10 @@ class SongButton extends Component {
                 onClick={() => {
                     this.props.onAnswer(this.props.song.id)
                 }
-                } />
+                }
+                backgroundColor={this.props.color}
+                disabledBackgroundColor={this.props.color}
+            />
         )
     }
 }
