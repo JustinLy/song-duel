@@ -5,6 +5,7 @@ const Game = require('Game/Game.js');
 const PlayerController = require('controllers/PlayerController.js');
 const EventEmitter = require('events').EventEmitter;
 const PlayerEvents = require('events/PlayerEvents.js');
+const GameEvents = require('events/GameEvents.js');
 
 let gameMap = null;
 let gameEmitter = null;
@@ -42,20 +43,28 @@ exports.init = function (socketIo) {
             console.log('user joined ' + data.gameId);
             let joinedGame = gameMap.get(data.gameId);
 
-            //Generate new player ID for player
-            const playerId = uuidv4();
+            if (joinedGame && !joinedGame.isDestroyed && !joinedGame.isFull()) {
+                //Generate new player ID for player
+                const playerId = uuidv4();
 
-            //Attach game and player info to socket and add it to room
-            socket.gameId = data.gameId;
-            socket.playerId = playerId;
-            socket.join(data.gameId);
+                //Attach game and player info to socket and add it to room
+                socket.gameId = data.gameId;
+                socket.playerId = playerId;
+                socket.join(data.gameId);
 
-            let playerController = new PlayerController(socket, joinedGame);
-            joinedGame.addPlayer(playerController, data.displayName, playerId);
+                let playerController = new PlayerController(socket, joinedGame);
+                joinedGame.addPlayer(playerController, data.displayName, playerId);
+
+            }
         });
 
-        socket.on('disconect', function (data) {
-            //TODO: Check if game player belonged to is now empty and delete it if so
+        //End the game if player disconnects
+        socket.on('disconnect', function (data) {
+            let endedGame = gameMap.get(socket.gameId);
+            if (endedGame && !endedGame.isDestroyed) {
+                io.sockets.in(socket.gameId).emit(GameEvents.PLAYER_DISCONNECTED, {});
+                endedGame.destroy();
+            }
         });
     });
 }

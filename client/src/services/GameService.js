@@ -2,7 +2,7 @@ import openSocket from 'socket.io-client';
 
 let instance = null;
 let socket = null;
-
+let connected = false;
 /**
  * Encapsulates the socket used to communicate game events with
  * the backend. Components can just use these methods to send
@@ -12,17 +12,34 @@ class GameService {
     constructor() {
         if (!instance) {
             instance = this;
-            socket = openSocket('http://localhost:3001');
         }
         return instance;
     }
 
+    _connect() {
+        socket = openSocket('http://localhost:3001');
+        connected = true;
+    }
+
     sendEvent(event, data) {
+        if (!connected) {
+            this._connect();
+        }
         socket.emit(event, data);
     }
 
     onEvent(event, callback) {
+        if (!connected) {
+            this._connect();
+        }
         socket.on(event, callback);
+    }
+
+    shutdown() {
+        if (connected && socket) {
+            socket.close();
+            connected = false;
+        }
     }
 }
 

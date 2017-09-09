@@ -17,6 +17,8 @@ import Col from 'muicss/lib/react/col';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import ActionHome from 'material-ui/svg-icons/action/home';
 
 import {
     Table,
@@ -47,10 +49,11 @@ class GameRoom extends Component {
         this.onDisplayNameChange = this.onDisplayNameChange.bind(this);
         this.onSongSelected = this.onSongSelected.bind(this);
         this.onAnswer = this.onAnswer.bind(this);
+        this.onReturnHomePage = this.onReturnHomePage.bind(this);
     }
 
     componentDidMount() {
-        //Attach all socket event listeners
+        //Attach all socket event listeners. (but only after a player has joined)
         GameService.onEvent(GameEvents.NEW_PLAYER, this.onNewPlayer.bind(this));
         GameService.onEvent(GameEvents.CHOOSE_SONG, this.onChooseSong.bind(this));
         GameService.onEvent(GameEvents.WAIT_SONG, this.onWaitSong.bind(this));
@@ -58,6 +61,7 @@ class GameRoom extends Component {
         GameService.onEvent(GameEvents.DISPLAY_SONG_WAIT, this.onDisplayQuestionWait.bind(this));
         GameService.onEvent(GameEvents.UPDATE_SCORE, this.onUpdateScore.bind(this));
         GameService.onEvent(GameEvents.PLAYER_WON, this.onPlayerWon.bind(this));
+        GameService.onEvent(GameEvents.PLAYER_DISCONNECTED, this.onPlayerDisconnected.bind(this));
     }
 
     /********** Define socket game event handlers **********/
@@ -124,7 +128,20 @@ class GameRoom extends Component {
         });
     }
 
+    onPlayerDisconnected(data) {
+        this.setState({
+            turnDescription: "A player disconnected. Gameover",
+            choosingSong: false,
+            answering: false
+        });
+    }
+
     /********** UI event handlers **********/
+
+    onReturnHomePage() {
+        GameService.shutdown();
+        this.props.history.push('/');
+    }
 
     onDialogCancel(e) {
         if (e.preventDefault) {
@@ -134,6 +151,8 @@ class GameRoom extends Component {
         this.setState({
             nameDialogOpen: false
         });
+
+        this.onReturnHomePage();
     }
 
     onDialogOk(e) {
@@ -224,28 +243,20 @@ class GameRoom extends Component {
             };
 
             return (
-                // <Container fluid={true}>
-
-                //     <Container fluid={true}>
-                //         <Row>
-                //             <Col md="12">{this.state.turnDescription}</Col>
-                //         </Row>
-                //     </Container>
-                //     <Table
-                //         className="Scoreboard"
-                //         style={scoreboardStyle}
-                //     >
-                //         <TableBody displayRowCheckbox={false}>{scoreRows}</TableBody>
-                //     </Table >
-
-                // </Container>
-
                 <Container fluid={true}>
                     <Row>
                         <Col md="9">
                             <Container fluid={true}>
                                 <Row>
-                                    <Col md="12">{this.state.turnDescription}</Col>
+                                    <Col md="1">
+                                        <IconButton
+                                            tooltip="Return to home page"
+                                            onClick={this.onReturnHomePage}
+                                        >
+                                            <ActionHome />
+                                        </IconButton>
+                                    </Col>
+                                    <Col md="11" className="TurnDescription">{this.state.turnDescription}</Col>
                                 </Row>
 
                                 <Row>
@@ -273,11 +284,32 @@ class GameRoom extends Component {
                                 className="Scoreboard"
                                 style={scoreboardStyle}
                             >
+                                <TableHeader
+                                    displaySelectAll={false}
+                                    adjustForCheckbox={false}
+                                    enableSelectAll={false}
+                                >
+                                    <TableRow>
+                                        <TableHeaderColumn
+                                            colSpan="2"
+                                            style={
+                                                {
+                                                    textAlign: 'center',
+                                                    fontSize: "16px",
+                                                    color: "black",
+                                                    backgroundColor: "lightskyblue"
+                                                }
+                                            }
+                                            displayRowCheckbox={false}>
+                                            Score
+                                        </TableHeaderColumn>
+                                    </TableRow>
+                                </TableHeader>
                                 <TableBody displayRowCheckbox={false}>{scoreRows}</TableBody>
                             </Table >
                         </Col>
                     </Row>
-                </Container>
+                </Container >
             )
 
         }

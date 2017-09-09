@@ -29,6 +29,7 @@ class SongButton extends Component {
                     }
                     backgroundColor={this.props.color}
                     disabledBackgroundColor={this.props.color}
+                    primary={true}
                 />
             )
         } else {

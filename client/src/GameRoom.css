@@ -13,6 +13,13 @@
     height:100%
 }
 
+.TurnDescription {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
+}
+
 .QuestionPanel {
     border-style: solid;
     border-width: 1px;

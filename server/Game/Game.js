@@ -21,6 +21,7 @@ class Game {
         this.endScore = endScore;
         this.gameEmitter = gameEmitter;
         this.playerMap = new Map();
+        this.isDestroyed = false;
     }
 
     /**
@@ -177,7 +178,14 @@ class Game {
         return SpotifyService.search(query);
     }
 
+    isFull() {
+        return this.playerMap.size >= this.numPlayers;
+    }
+
     destroy() {
+        //Mark game as destroyed so that further player disconnect events cannot trigger destroy again
+        this.isDestroyed = true;
+
         this.playerMap.forEach((state, id) => {
             state.destroy();
         });
@@ -185,6 +193,8 @@ class Game {
         this.playerMap = null;
 
         this.gameEmitter = null;
+
+
     }
 
     _getScoreMap() {

@@ -8,7 +8,7 @@ import GameEvents from '../common/GameEvents.js';
 class SearchBar extends Component {
     constructor(props) {
         super(props);
-        this.onUpdateInput = debounce(this.onUpdateInput.bind(this), 700);
+        this.onUpdateInput = debounce(this.onUpdateInput.bind(this), 500);
         this._onSearchResults = this._onSearchResults.bind(this);
         this._search = this._search.bind(this);
         this.onNewRequest = this.onNewRequest.bind(this);
@@ -37,9 +37,11 @@ class SearchBar extends Component {
     }
 
     _search() {
-        GameService.sendEvent(PlayerEvents.SEARCH, {
-            "query": this.state.inputValue
-        });
+        if (this.state.inputValue) {
+            GameService.sendEvent(PlayerEvents.SEARCH, {
+                "query": this.state.inputValue
+            });
+        }
     }
 
     _onSearchResults(data) {
@@ -69,7 +71,7 @@ class SearchBar extends Component {
         };
 
         let listStyle = {
-            maxHeight: 200,
+            maxHeight: 300,
             overflow: 'auto'
         }
 

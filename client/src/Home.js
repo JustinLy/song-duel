@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './Home.css';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import NumberInput from 'material-ui-number-input';
-
+import CopyToClipboard from 'react-copy-to-clipboard';
+import TextField from 'material-ui/TextField';
 import DuelService from './services/DuelService.js';
+import logo from './resources/logo.png';
+import IconButton from 'material-ui/IconButton';
 
 class Home extends Component {
     constructor(props) {
@@ -113,16 +115,19 @@ class Home extends Component {
         return (
             <div className="App">
                 <div className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h2>Song Duel</h2>
+                    <h1>Song Duel</h1>
                 </div>
                 <p className="App-intro">
-                    Welcome to Song Duel! In this game, players take turns selecting
-                songs from Spotify and generating a multiple choice question to
-                the other players while a 30s preview of the song plays.
-                Players will then try to correctly guess the playing song.
+                    Welcome to Song Duel, a game where you can challenge your friends's music knowledge!<br />
+                    Players take turns selecting a song from Spotify's vast collection of songs. <br />
+                    A multiple-choice question is then generated containing that song and similar songs
+                    while a 30s preview of the song plays.<br />
+                    The player will then try to guess the song correctly.
                 </p>
-                <RaisedButton label="New Game" onClick={this.onNewGameClick} />
+                <br />
+                <RaisedButton label="New Game" onClick={this.onNewGameClick} primary={true} />
+                <br /><br />
+                <img src={logo} alt="logo" style={{ width: "35%" }} />
                 <Dialog
                     title="Create new game"
                     actions={actions}
@@ -149,7 +154,19 @@ class Home extends Component {
                     open={this.state.joinDialogOpen}
                     onRequestClose={this.onJoinCancel}
                 >
-                    Join URL: {this._createJoinUrl(this.state.gameId)}
+                    <TextField
+                        defaultValue={this._createJoinUrl(this.state.gameId)}
+                        floatingLabelText="Send this URL to your friend"
+                        style={{
+                            width: "90%",
+                            marginRight: "0.5em"
+                        }}
+                        floatingLabelFixed={true}
+                    />
+                    {/* <span className="JoinUrl">Join URL: {this._createJoinUrl(this.state.gameId)}</span> */}
+                    <CopyToClipboard text={this._createJoinUrl(this.state.gameId)}>
+                        <button>Copy</button>
+                    </CopyToClipboard>
                 </Dialog>
             </div>
         )
