@@ -2,7 +2,7 @@ import axios from 'axios';
 
 let instance = null;
 const server = axios.create({
-    baseURL: 'http://localhost:3001'
+    baseURL: `${window.protocol}//${window.location.hostname}:${process.env.PORT || 3001}`
 });
 
 class DuelService {

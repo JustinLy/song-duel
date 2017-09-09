@@ -4,6 +4,11 @@ let app = require('express')();
 const cors = require('cors');
 app.use(cors());
 
+app.set('port', (process.env.PORT || 3001));
+// Express only serves static assets in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'));
+}
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
@@ -15,6 +20,6 @@ let routes = require('router.js');
 routes(app);
 
 
-http.listen(3001, function () {
+http.listen(app.get('port'), function () {
     console.log("Server started");
 });
