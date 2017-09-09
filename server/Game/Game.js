@@ -143,7 +143,7 @@ class Game {
         if (this._allPlayerMovesMade()) {
             //Check if a player has won
             let winner = null;
-            for (playerState of this.playerMap.values()) {
+            for (let playerState of this.playerMap.values()) {
                 if (playerState.score === this.endScore) {
                     winner = playerState.displayName
                     break;
@@ -151,7 +151,7 @@ class Game {
             }
 
             if (winner) {
-                gameEmitter.emit("gameover", {
+                this.gameEmitter.emit("gameOver", {
                     eventId: GameEvents.PLAYER_WON,
                     gameId: this.gameId,
                     eventData: {
@@ -217,7 +217,7 @@ class Game {
      * or if we're still waiting on input from some players.
      */
     _allPlayerMovesMade() {
-        for (state of this.playerMap.values()) {
+        for (let state of this.playerMap.values()) {
             if (!state.hasMadeMove()) {
                 return false;
             }

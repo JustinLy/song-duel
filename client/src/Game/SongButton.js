@@ -8,25 +8,32 @@ class SongButton extends Component {
     }
 
     render() {
-        let style = {
-            width: "20vh",
-            height: "10vh",
-            "lineHeight": "138%",
 
+
+        if (this.props.song) {
+            let style = {
+                width: "20vh",
+                height: "10vh",
+                "lineHeight": "138%",
+
+            }
+
+            return (
+                <RaisedButton
+                    style={style}
+                    disabled={!this.props.enabled}
+                    label={this.props.song.name}
+                    onClick={() => {
+                        this.props.onAnswer(this.props.song.id)
+                    }
+                    }
+                    backgroundColor={this.props.color}
+                    disabledBackgroundColor={this.props.color}
+                />
+            )
+        } else {
+            return <div></div>
         }
-        return (
-            <RaisedButton
-                style={style}
-                disabled={!this.props.enabled}
-                label={this.props.song.name}
-                onClick={() => {
-                    this.props.onAnswer(this.props.song.id)
-                }
-                }
-                backgroundColor={this.props.color}
-                disabledBackgroundColor={this.props.color}
-            />
-        )
     }
 }
 

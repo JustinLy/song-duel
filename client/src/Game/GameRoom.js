@@ -38,6 +38,7 @@ class GameRoom extends Component {
             turnDescription: "Waiting for all players to join",
             choosingSong: false,
             question: null,
+            songUrl: null,
             answering: false
         }
 
@@ -56,6 +57,7 @@ class GameRoom extends Component {
         GameService.onEvent(GameEvents.DISPLAY_SONG_ANSWER, this.onDisplayQuestionAnswer.bind(this));
         GameService.onEvent(GameEvents.DISPLAY_SONG_WAIT, this.onDisplayQuestionWait.bind(this));
         GameService.onEvent(GameEvents.UPDATE_SCORE, this.onUpdateScore.bind(this));
+        GameService.onEvent(GameEvents.PLAYER_WON, this.onPlayerWon.bind(this));
     }
 
     /********** Define socket game event handlers **********/
@@ -106,10 +108,20 @@ class GameRoom extends Component {
             scoreMap: data.scoreMap
         }, () => {
             setTimeout(() => {
+                this.setState({
+                    question: null
+                });
                 GameService.sendEvent(PlayerEvents.READY_FOR_NEXT_ROUND, {});
             }, 2000);
         });
+    }
 
+    onPlayerWon(data) {
+        this.setState({
+            turnDescription: `${data.winner} has won!`,
+            choosingSong: false,
+            answering: false
+        });
     }
 
     /********** UI event handlers **********/

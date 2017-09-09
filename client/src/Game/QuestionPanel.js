@@ -7,6 +7,7 @@ import SongButton from './SongButton.js';
 import GameService from '../services/GameService.js';
 import PlayerEvents from '../common/PlayerEvents.js';
 import GameEvents from '../common/GameEvents.js';
+import ReactPlayer from 'react-player'
 
 class QuestionPanel extends Component {
     constructor(props) {
@@ -40,7 +41,7 @@ class QuestionPanel extends Component {
     }
 
     getAnswerColor(song) {
-        if (this.state.currentAnswer && song.id === this.state.currentAnswer.answerSongId) {
+        if (song && this.state.currentAnswer && song.id === this.state.currentAnswer.answerSongId) {
             return this.state.currentAnswer.isCorrect ? "lightgreen" : "red";
         } else {
             return "transparent";
@@ -92,6 +93,15 @@ class QuestionPanel extends Component {
                                 song={this.props.question.songOptions[3]}
                                 onAnswer={this.props.onAnswer}
                                 color={this.getAnswerColor(this.props.question.songOptions[3])}
+                            />
+                        </Col>
+                    </Row>
+
+                    <Row>
+                        <Col md="0">
+                            <ReactPlayer
+                                url={this.props.question.previewUrl}
+                                playing={Boolean(this.props.question)}
                             />
                         </Col>
                     </Row>

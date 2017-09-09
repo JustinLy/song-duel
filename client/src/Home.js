@@ -156,7 +156,7 @@ class Home extends Component {
     }
 
     _createJoinUrl(gameId) {
-        return `${window.location.hostname}/game/${gameId}`;
+        return `${window.location.hostname}:${window.location.port}/game/${gameId}`;
     }
 }
 

@@ -34,7 +34,7 @@ class PlayerController {
     }
 
     destroy() {
-        this.socket.close();
+        this.socket.disconnect(true);
         this.game = null;
     }
 }

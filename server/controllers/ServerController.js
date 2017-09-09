@@ -22,10 +22,10 @@ exports.init = function (socketIo) {
         //Broadcast the gameover event to players. eventId will be the reason why game ended
         io.sockets.in(data.gameId).emit(data.eventId, data.eventData);
 
-        let currentGame = data.gameId ? this.gameMap.get(data.gameId) : null;
+        let currentGame = data.gameId ? gameMap.get(data.gameId) : null;
         if (currentGame) {
             currentGame.destroy();
-            this.gameMap.delete(gameId);
+            gameMap.delete(data.gameId);
         }
     });
 
@@ -70,7 +70,7 @@ exports.init = function (socketIo) {
 exports.newGame = function (request, response) {
     let numPlayers = 2; //Change this to a variable passed in request if you decide to support more players.
     const gameId = uuidv4();
-    gameMap.set(gameId, new Game(gameId, numPlayers, request.params.endScore, gameEmitter));
+    gameMap.set(gameId, new Game(gameId, numPlayers, Number(request.query.endScore), gameEmitter));
 
     console.log("made a new game id: " + gameId);
     response.send({

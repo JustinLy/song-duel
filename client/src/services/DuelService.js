@@ -14,7 +14,11 @@ class DuelService {
     }
 
     createNewGame(endScore) {
-        return server.get('/newGame').then((response) => {
+        return server.get('/newGame', {
+            params: {
+                endScore: endScore
+            }
+        }).then((response) => {
             return response.data.gameId;
         }).catch((error) => {
             console.log('Failed to create game', error.message);

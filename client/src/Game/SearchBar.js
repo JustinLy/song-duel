@@ -30,6 +30,9 @@ class SearchBar extends Component {
     }
 
     onNewRequest(searchItem) {
+        this.setState({
+            inputValue: ""
+        });
         this.props.onItemSelected(searchItem.id);
     }
 
@@ -65,8 +68,14 @@ class SearchBar extends Component {
             value: 'id'
         };
 
+        let listStyle = {
+            maxHeight: 200,
+            overflow: 'auto'
+        }
+
         return (
             <AutoComplete
+                searchText={this.state.inputValue}
                 dataSource={this.state.dataSource}
                 onUpdateInput={this.onUpdateInput}
                 disabled={!this.props.enabled}
@@ -74,6 +83,8 @@ class SearchBar extends Component {
                 hintText="Enter the name of a song"
                 filter={(searchText, key) => true}
                 onNewRequest={this.onNewRequest}
+                fullWidth={true}
+                listStyle={listStyle}
             />
         );
     }
