@@ -1,6 +1,7 @@
 require('app-module-path').addPath(__dirname);
+const express = require('express');
 
-let app = require('express')();
+let app = express();
 const cors = require('cors');
 app.use(cors());
 
