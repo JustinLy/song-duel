@@ -2,6 +2,12 @@ Song Duel is a real-time multiplayer web game that allows players to challenge e
 knowledge of music. Two players join a game and take turns selecting a song from Spotify's vast collection of songs. A multiple-choice question is then generated containing the selected song and similar songs, while a 30-second preview of the song plays. The other player will then try to guess the song correctly for a point.
 The first one to reach the set number of points wins.
 
+# Demo Video
+This is a demo video of the game being played. Note that I am playing against myself in 2 different browser windows.
+<a href="https://www.youtube.com/watch?v=Jn5Z1g1B_Io
+" target="_blank"><img src="https://github.com/JustinLy/song-duel/blob/master/song%20duel.png" 
+alt="IMAGE ALT TEXT HERE" width="640" height="360" border="10" /></a>
+
 # Playing the game
 
 Visit https://song-duel.herokuapp.com to start playing the game!
