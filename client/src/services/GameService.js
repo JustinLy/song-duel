@@ -1,4 +1,4 @@
-import openSocket from 'socket.io-client';
+import io from 'socket.io-client';
 
 let instance = null;
 let socket = null;
@@ -17,7 +17,7 @@ class GameService {
     }
 
     _connect() {
-        socket = openSocket('http://localhost:3001');
+        socket = io();
         connected = true;
     }
 

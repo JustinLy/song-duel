@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 let instance = null;
-const server = axios.create({
-    baseURL: 'http://localhost:3001'
-});
+const server = axios.create();
 
 class DuelService {
     constructor() {
@@ -14,7 +12,7 @@ class DuelService {
     }
 
     createNewGame(endScore) {
-        return server.get('/newGame', {
+        return server.get(`/newGame`, {
             params: {
                 endScore: endScore
             }
