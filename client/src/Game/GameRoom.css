@@ -1,0 +1,46 @@
+.Scoreboard {
+    border-style: solid;
+    border-width: 1px;
+    border-color: blue;
+}
+
+.GameContainer {
+    float:left;
+    width:75%
+}
+
+.Room {
+    height:100%
+}
+
+.TurnDescription {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
+    margin-left: -1em;
+}
+
+.QuestionPanel {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    text-align: center;
+}
+
+.first-row-buttons {
+    margin-bottom : 7vh;
+    margin-top : 6vh;
+}
+
+.QuestionPanel span {
+    text-overflow: ellipsis;
+}
+
+.QuestionPanel button {
+    height : 8vh;
+}
+
+.SearchBar {
+    margin-top: 2vh
+}

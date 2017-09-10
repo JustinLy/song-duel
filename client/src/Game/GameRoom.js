@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
-import '../GameRoom.css';
+import './GameRoom.css';
 
 import GameService from '../services/GameService.js';
 import PlayerEvents from '../common/PlayerEvents.js';
@@ -270,7 +269,7 @@ class GameRoom extends Component {
                                 </Row>
 
                                 <Row>
-                                    <Col md="12">
+                                    <Col md="12" className="SearchBar">
                                         <SearchBar
                                             enabled={this.state.choosingSong}
                                             onItemSelected={this.onSongSelected} />

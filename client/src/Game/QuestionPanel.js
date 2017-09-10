@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Container from 'muicss/lib/react/container';
 import Row from 'muicss/lib/react/row';
 import Col from 'muicss/lib/react/col';
-import '../GameRoom.css';
+import './GameRoom.css';
 import SongButton from './SongButton.js';
 import GameService from '../services/GameService.js';
 import PlayerEvents from '../common/PlayerEvents.js';
@@ -50,15 +50,15 @@ class QuestionPanel extends Component {
 
     render() {
         let containerStyle = {
-            width: "60vh",
-            height: "50vh"
+            width: "100vh",
+            height: "60vh"
         };
 
         if (this.props.question) {
             return (
                 <Container fluid={true} style={containerStyle} className="QuestionPanel">
-                    <Row className="first-row-buttons">
-                        <Col md="5">
+                    <Row className="first-row-buttons QuestionRow" noGutters={true}>
+                        <Col md="6">
                             <SongButton
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[0]}
@@ -67,7 +67,7 @@ class QuestionPanel extends Component {
                             />
                         </Col>
 
-                        <Col md="5" md-offset="2">
+                        <Col md="6">
                             <SongButton
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[1]}
@@ -77,8 +77,8 @@ class QuestionPanel extends Component {
                         </Col>
                     </Row>
 
-                    <Row>
-                        <Col md="5">
+                    <Row className="QuestionRow">
+                        <Col md="6">
                             <SongButton
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[2]}
@@ -87,7 +87,7 @@ class QuestionPanel extends Component {
                             />
                         </Col>
 
-                        <Col md="5" md-offset="2">
+                        <Col md="6">
                             <SongButton
                                 enabled={this.props.canAnswer}
                                 song={this.props.question.songOptions[3]}

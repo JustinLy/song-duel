@@ -12,8 +12,8 @@ class SongButton extends Component {
 
         if (this.props.song) {
             let style = {
-                width: "20vh",
-                height: "10vh",
+                width: "30vh",
+                height: "20vh",
                 "lineHeight": "138%",
 
             }

@@ -87,6 +87,8 @@ class SearchBar extends Component {
                 onNewRequest={this.onNewRequest}
                 fullWidth={true}
                 listStyle={listStyle}
+                inputStyle={{ textAlign: 'center' }}
+                hintStyle={{ textAlign: 'center', width: '100%' }}
             />
         );
     }
