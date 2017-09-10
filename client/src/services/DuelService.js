@@ -12,7 +12,7 @@ class DuelService {
     }
 
     createNewGame(endScore) {
-        return server.get(`/newGame`, {
+        return server.get(`/asdf`, {
             params: {
                 endScore: endScore
             }
