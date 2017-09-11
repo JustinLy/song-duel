@@ -14,8 +14,8 @@ if (process.env.NODE_ENV === 'production') {
 
 app.get('/game/:gameId', function (request, response) {
     console.log("the * thing");
-    console.log(path.resolve('..', 'client', 'public', 'index.html'));
-    response.sendFile(path.resolve('..', 'client', 'public', 'index.html'))
+    console.log(path.resolve(__dirname, '..', 'client', 'public', 'index.html'));
+    response.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'index.html'))
 });
 
 let http = require('http').Server(app);
