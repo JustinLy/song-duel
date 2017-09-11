@@ -12,11 +12,11 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
 }
 
-app.get('/game/:gameId', function (request, response) {
-    console.log("the * thing");
-    console.log(path.resolve(__dirname, '..', 'client', 'public', 'index.html'));
-    response.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'index.html'))
-});
+// app.get('/game/:gameId', function (request, response) {
+//     console.log("the * thing");
+//     console.log(path.resolve(__dirname, '..', 'client', 'public', 'index.html'));
+//     response.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'index.html'))
+// });
 
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
