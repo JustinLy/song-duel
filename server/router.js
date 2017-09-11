@@ -10,8 +10,8 @@ module.exports = function (app) {
     .get(serverController.joinGame);
 
   //used to serve static client on the production server.
-  app.route
-    .get('*', function (request, response) {
+  app.route('*')
+    .get(function (request, response) {
       response.sendFile(path.resolve(__dirname, '..', 'client', 'build', 'index.html'))
     });
 }
