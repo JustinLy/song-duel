@@ -10,6 +10,7 @@ app.set('port', (process.env.PORT || 3001));
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
 }
+
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
@@ -19,7 +20,6 @@ serverController.init(io);
 
 let routes = require('router.js');
 routes(app);
-
 
 http.listen(app.get('port'), function () {
     console.log("Server started");
